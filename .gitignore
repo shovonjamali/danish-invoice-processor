@@ -53,6 +53,9 @@ local/
 processed/
 downloads/
 output/
+# Allow sample PDFs in docs
+!docs/samples/*.pdf
+# Block PDFs and XMLs in working directories
 *.pdf
 *.xml
 logs/
