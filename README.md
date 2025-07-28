@@ -40,8 +40,8 @@ Processes PDF files from the `local/` directory.
 
 ### 1. Clone and Install
 ```bash
-git clone [repository-url]
-cd invoice-processing-system
+git clone https://github.com/shovonjamali/danish-invoice-processor
+cd danish-invoice-processor
 python -m venv venv
 
 # Activate virtual environment
