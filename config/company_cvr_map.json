@@ -1,0 +1,20 @@
+{
+    "company_cvr_map": {
+      "lego": "47458714",
+      "lego system": "47458714",
+      "universal robots": "29138060", 
+      "danfoss": "20165715",
+      "novo nordisk": "24256790",
+      "carlsberg": "25508343",
+      "carlsberg breweries": "25508343"
+    },
+    "company_gln_map": {
+      "lego": "5790000123456",
+      "lego system": "5790000123456",
+      "universal robots": "5790000234567",
+      "danfoss": "5790000345678", 
+      "novo nordisk": "5790000456789",
+      "carlsberg": "5790000567890",
+      "carlsberg breweries": "5790000567890"
+    }
+  }

@@ -1,0 +1,12 @@
+{
+  "default_customer": {
+    "name": "Nordsjælland Teknik ApS",
+    "vat": "DK29847156",
+    "street": "Hovedgade 45B",
+    "city": "Hillerød",
+    "postal_code": "3400",
+    "country": "DK",
+    "contact_name": "Lars Nielsen",
+    "contact_phone": "48262890"
+  }
+}
