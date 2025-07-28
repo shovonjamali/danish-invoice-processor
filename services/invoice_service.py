@@ -308,12 +308,6 @@ class InvoiceService:
                     logger.info(f"EXTRACTION: Found {len(chunk_data['line_items'])} line items in chunk {i+1}")
                     for idx, item in enumerate(chunk_data['line_items']):
                         logger.info(f"EXTRACTION: Line {idx+1} from chunk {i+1}: {item}")
-                        # Special logging for the third line item (if it exists)
-                        # if idx == 2 or "kobberrør" in str(item.get('description', '')).lower():
-                        #     logger.info(f"CRITICAL - COPPER PIPE LINE FOUND: {item}")
-                        #     logger.info(f"COPPER PIPE data keys: {item.keys()}")
-                        #     for key, value in item.items():
-                        #         logger.info(f"COPPER PIPE {key}: {value} (type: {type(value)})")
 
                     line_items.extend(chunk_data.pop("line_items", []))
                 
@@ -354,7 +348,7 @@ class InvoiceService:
                 1. FIK PAYMENT (Code 93):
                 - MUST have format: +71<...+...< or +73<...+...< or +75<...+...< 
                 - Look for "Betalings-id:" or "+71<" patterns
-                - Example: "+71<109900691786801+83195487<"
+                - Example: "+71<123456789012345+98765432<"
                 - For FIK: payment_means_code = 93, payment_id = 71/73/75
                 - instruction_id = 15 digits BEFORE the +
                 - account_id = EXACTLY 8 digits AFTER the +
@@ -701,21 +695,24 @@ class InvoiceService:
                 # Fallback to default mapping if config file doesn't exist
                 logger.warning(f"Configuration file not found: {config_path}, using default mapping")
                 company_cvr_map = {
-                    "elcor": "73240816",             # Elcor Sønderborg A/S
-                    "vojens køleteknik": "18411180", # Vojens Køleteknik A/S
-                    "co2oltec": "83693711",          # CO2OLTEC Commercial Refrigeration Denmark ApS
-                    "h. jessen": "16920401",         # H. Jessen Jørgensen A/S
-                    "jessen jørgensen": "16920401",  # H. Jessen Jørgensen A/S
-                    "rema 1000": "20642149",         # Rema 1000 Danmark A/S
-                    "rema1000": "20642149"           # Rema 1000 Danmark A/S (without space)
+                    "lego": "47458714",
+                    "lego system": "47458714",
+                    "universal robots": "29138060", 
+                    "danfoss": "20165715",
+                    "novo nordisk": "24256790",
+                    "carlsberg": "25508343",
+                    "carlsberg breweries": "25508343"
                 }
 
                 # Add a new mapping for GLN numbers
                 gln_map = {
-                    "elcor": "5790000000000",  # Example GLN (you need real ones)
-                    "vojens køleteknik": "5790000000001",
-                    "h. jessen": "5790000000002",
-                    "rema 1000": "5790000436003"  # Real Rema 1000 GLN
+                    "lego": "5790000123456",
+                    "lego system": "5790000123456",
+                    "universal robots": "5790000234567",
+                    "danfoss": "5790000345678", 
+                    "novo nordisk": "5790000456789",
+                    "carlsberg": "5790000567890",
+                    "carlsberg breweries": "5790000567890"
                 }
                 
                 # Check for GLN
@@ -727,13 +724,13 @@ class InvoiceService:
             logger.error(f"Error loading company mapping configuration: {e}")
             # Fallback to default mapping on error
             company_cvr_map = {
-                "elcor": "73240816",
-                "vojens køleteknik": "18411180",
-                "co2oltec": "83693711",
-                "h. jessen": "16920401",
-                "jessen jørgensen": "16920401",
-                "rema 1000": "20642149",
-                "rema1000": "20642149"
+                "lego": "47458714",
+                "lego system": "47458714",
+                "universal robots": "29138060", 
+                "danfoss": "20165715",
+                "novo nordisk": "24256790",
+                "carlsberg": "25508343",
+                "carlsberg breweries": "25508343"
             }
         
         # Normalize the company name (lowercase and remove special chars)
@@ -991,13 +988,6 @@ class InvoiceService:
             
             for item in line_items:
                 try:
-                    # temporarily handle special cases to debug
-                    # if "kobberrør" in item.get('description', '').lower() and item.get('item_number') == '2124408997':
-                    #     item['quantity'] = 5
-                    #     item['unit'] = 'm'
-                    #     item['discount'] = 92.17  # This will give approximately the right result
-                    #     logger.info(f"Applied special handling to copper pipe item: {item}")
-                    
                     qty = float(item.get("quantity", 0))
                     unit_price = float(item.get("unit_price", 0))
                     line_amount = qty * unit_price
@@ -1143,7 +1133,7 @@ class InvoiceService:
             # If enhanced generation failed, fall back to the old template method
             if not xml_content:
                 logger.warning("Enhanced OIOXML generation failed, falling back to template method")
-                # Your existing template-based generation code would go here
+                # The existing template-based generation code would go here
                 # [...]
                 
             return xml_content
@@ -1344,21 +1334,6 @@ class InvoiceService:
             xml_parts.append(f'    <cbc:IssueDate>{order_date}</cbc:IssueDate>')
             xml_parts.append('  </cac:OrderReference>')
             
-            ## Order reference - full
-            # order_id = data.get("order_id", f"ORD-{data.get('invoice_number', 'UNKNOWN')}")
-            # xml_parts.append('  <cac:OrderReference>')
-            # xml_parts.append(f'    <cbc:ID schemeID="ON">{order_id}</cbc:ID>')
-            # xml_parts.append(f'    <cbc:SalesOrderID schemeID="VN">{data.get("sales_order_id", order_id)}</cbc:SalesOrderID>')
-            # xml_parts.append(f'    <cbc:IssueDate>{data.get("order_date", data.get("invoice_date", datetime.now().strftime("%Y-%m-%d")))}</cbc:IssueDate>')
-            # if data.get("customer_reference"):
-            #     xml_parts.append(f'    <cbc:CustomerReference>{data.get("customer_reference")}</cbc:CustomerReference>')
-            # xml_parts.append('  </cac:OrderReference>')
-            
-            # Despatch document reference (NEW)
-            # xml_parts.append('  <cac:DespatchDocumentReference>')
-            # xml_parts.append(f'    <cbc:ID schemeID="AAU">{data.get("despatch_id", data.get("sales_order_id", order_id))}</cbc:ID>')
-            # xml_parts.append('  </cac:DespatchDocumentReference>')
-            
             # Contract document reference (NEW)
             xml_parts.append('  <cac:ContractDocumentReference>')
             xml_parts.append(f'    <cbc:ID schemeID="CT">{data.get("contract_id", "1")}</cbc:ID>')
@@ -1434,7 +1409,6 @@ class InvoiceService:
             if len(supplier_vat) != 10 or not supplier_vat.startswith("DK"):
                 supplier_vat = f"DK{supplier_cvr}"  # Fallback to CVR-based VAT
                 logger.warning(f"Invalid supplier VAT format, using CVR-based: {supplier_vat}")
-
 
             xml_parts.append(f'        <cbc:CompanyID schemeID="DK:SE">{supplier_vat}</cbc:CompanyID>')
             xml_parts.append('        <cac:TaxScheme>')
@@ -1547,7 +1521,6 @@ class InvoiceService:
             xml_parts.append('      <cac:PartyName>')
             xml_parts.append(f'        <cbc:Name>{supplier_name}</cbc:Name>')
             xml_parts.append('      </cac:PartyName>')
-            
             
             # Use same address values as above
             xml_parts.append('      <cac:PostalAddress>')
@@ -1770,14 +1743,12 @@ class InvoiceService:
             xml_parts.append('    </cac:TaxSubtotal>')
             xml_parts.append('  </cac:TaxTotal>')
 
-        
-            # # Log the calculation for debugging
+            # Log the calculation for debugging
             # logger.info(f"Validator workaround: TaxExclusive={tax_exclusive}, LinesTaxSum={line_taxes_sum}, AdjustedDocTax={document_tax_adjusted}")
             
             # Legal monetary total with precise amounts
             xml_parts.append('  <cac:LegalMonetaryTotal>')
             xml_parts.append(f'    <cbc:LineExtensionAmount currencyID="{data.get("currency", "DKK")}">{self.format_amount(data.get("line_extension_amount", "0"))}</cbc:LineExtensionAmount>')
-            # xml_parts.append(f'    <cbc:TaxExclusiveAmount currencyID="{data.get("currency", "DKK")}">{self.format_amount(real_tax_amount)}</cbc:TaxExclusiveAmount>')
             ## FIX: Use the total tax amount calculated above
             xml_parts.append(f'    <cbc:TaxExclusiveAmount currencyID="{data.get("currency", "DKK")}">{self.format_amount(total_tax)}</cbc:TaxExclusiveAmount>')
             xml_parts.append(f'    <cbc:TaxInclusiveAmount currencyID="{data.get("currency", "DKK")}">{self.format_amount(data.get("tax_inclusive_amount", "0"))}</cbc:TaxInclusiveAmount>')

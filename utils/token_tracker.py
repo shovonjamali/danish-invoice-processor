@@ -25,8 +25,8 @@ def get_token_usage() -> Dict[str, int]:
     }
 
 def get_cost_estimate() -> float:
-    prompt_cost = (prompt_tokens / 1000) * 0.0015  # $0.0015 per 1K tokens
-    completion_cost = (completion_tokens / 1000) * 0.002  # $0.002 per 1K tokens
+    prompt_cost = (prompt_tokens / 1000) * 0.0015
+    completion_cost = (completion_tokens / 1000) * 0.002
     return prompt_cost + completion_cost
 
 def reset_counters():
